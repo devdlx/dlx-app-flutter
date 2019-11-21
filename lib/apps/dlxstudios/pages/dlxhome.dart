@@ -1,25 +1,5 @@
-import 'package:dlxapp/components/coverListItem/coverlistitem.dart';
 import 'package:flutter/material.dart';
 
-class DLXHome extends StatefulWidget {
-  @override
-  _DLXHomeState createState() => _DLXHomeState();
-}
-
-class _DLXHomeState extends State<DLXHome> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            new SectionLatest(),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class SectionLatest extends StatelessWidget {
   const SectionLatest({
@@ -49,7 +29,7 @@ class SectionLatest extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               itemCount: 20,
               itemBuilder: (context, indx) {
-                return CoverListItem();
+                return Container();
               },
             ),
           )

@@ -1,6 +1,10 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 
 import 'dart:convert';
+
+import 'package:logger/logger.dart';
 
 String apiBaseUrl = "https://firestore.googleapis.com/v1/";
 String project =
@@ -29,11 +33,17 @@ Future<Map<String, dynamic>> fetchFirestore(String path) async {
 
 Future<Map<String, dynamic>> fetch(String path) async {
   // print('fetching endpoint $path');
-  final response = await http.get('$path');
+  var response;
+  try {
+    response = await http.get('$path');
+  } catch (e) {
+    return Future.error('unable to fetch from endpoint $path');
+  }
+
   try {
     return json.decode(response.body);
   } catch (e) {
-    return Future.error('unable to load from endpoint $path');
+    return Future.error('unable to decode to json from endpoint $path');
   }
 }
 
@@ -62,11 +72,11 @@ Future<Map<String, dynamic>> post(String path, dynamic body) async {
 
 List<DataItem> jsonFromList(List<dynamic> itemsJson, [String itemsSelector]) {
   List<DataItem> temp = [];
-  print('itemsSelector');
-  print(itemsSelector);
+  // print('itemsSelector');
+  // print(itemsSelector);
   if (itemsSelector != null) {
-    print('jsonFetchList selector $itemsSelector');
-    print("itemsJson.length ${itemsJson.length}");
+    // print('jsonFetchList selector $itemsSelector');
+    // print("itemsJson.length ${itemsJson.length}");
     for (int i = 0; i < itemsJson.length; i++) {
       DataItem result = DataItem(itemsJson[i]);
       temp.add(result);
@@ -104,30 +114,106 @@ Future<List<DataItem>> jsonFetchList(String url, [String itemsSelector]) async {
   });
 }
 
-String stringVarMap(String _input, DataItem _item) {
+Logger console = Logger();
+
+stringVarToConstant(String input) {
+  // Started, needs to be complete
+  var _processed;
+  String _matchGroup0;
+  String _matchGroup1;
+  // set the input if any
+  if (input == null) return {'error': 'no input'};
+
+  // Find vars in string between ${}
+  // (?<=\${)(.*?)(?=\})
+  RegExp regExp = new RegExp('{(.*?)}', caseSensitive: false);
+
+  Iterable<Match> matches = regExp.allMatches(input);
+
+  if (matches.length < 1) {
+    return _processed = input;
+  }
+
+  for (Match match in matches) {
+    _matchGroup0 = match.group(0);
+    _matchGroup1 = match.group(1);
+
+    // Check for nested
+    var nestedKeys = _matchGroup1.split('.');
+
+    switch (nestedKeys[0]) {
+      case 'Colors':
+        _processed = nestedKeys[1];
+        break;
+      default:
+    }
+
+    // for (var i = 0; i < nestedKeys.length; i++) {
+
+    //      stringVarLoop(nestedKeys[i]);
+    // }
+
+  }
+
+  return _processed;
+}
+
+Color getColorConst(String color) {
+  Color _color;
+
+  if (color!=null && color.startsWith('Colors')) color = stringVarToConstant(color);
+
+  switch (color) {
+    case 'amber':
+      _color = Colors.amber;
+      break;
+    default:
+      _color = Colors.orangeAccent;
+  }
+
+  return _color;
+}
+
+getThemeMode(String modeString) {
+  var mode = Brightness.light;
+
+  switch (modeString) {
+    case 'dark':
+      mode = Brightness.dark;
+
+      break;
+    default:
+  }
+
+  return mode;
+}
+
+stringVarLoop(input, {prev}) {}
+
+String stringVarMap(String input, {DataItem item}) {
   String _processed;
   String _matchGroup0;
   String _matchGroup1;
-  // set the _input if any
-  if (_input != null) {
-    // print(_input);
+  // set the input if any
+  if (input != null) {
+    // print(input);
 
     // Find vars in string between ${}
     // (?<=\${)(.*?)(?=\})
     RegExp regExp = new RegExp('{(.*?)}', caseSensitive: false);
 
-    // print("allMatches : "+regExp.allMatches(_input).first.toString());
-    // _input.replaceAllMapped(regExp, (Match m){
+    // print("allMatches : "+regExp.allMatches(input).first.toString());
+    // input.replaceAllMapped(regExp, (Match m){
     //   print('Match : '+ m.groupCount.toString());
     // });
 
-    Iterable<Match> matches = regExp.allMatches(_input);
+    Iterable<Match> matches = regExp.allMatches(input);
 
     // print("matches.length : ${matches.length.toString()}");
 
     if (matches.length < 1) {
-      // print(_input);
-      return _processed = _input ?? 'no data';
+      // print(input);
+      return _processed = input ?? 'no data';
     }
 
     for (Match match in matches) {
@@ -136,9 +222,9 @@ String stringVarMap(String _input, DataItem _item) {
 
       // print('Match');
 
-      // print("var : " + _input);
+      // print("var : " + input);
 
-      // print(_item.data['snippet']['title'] ?? 'null');
+      // print(item.data['snippet']['title'] ?? 'null');
 
       // print(match.toString());
       // print('match.group');
@@ -147,13 +233,13 @@ String stringVarMap(String _input, DataItem _item) {
 
       // Check for nested
       var nestedKeys = _matchGroup1.split('.');
-      dynamic dat = _item.data;
+      dynamic dat = item.data;
       // nestedKeys.reduce((prev, curr){
       //   print("prev : " + prev);
       // print("curr : " + curr);
-      //    dat = _item.data[prev];
+      //    dat = item.data[prev];
       //    print(dat.runtimeType);
-      // print("dat : ${ _item.data[prev][curr]}");
+      // print("dat : ${ item.data[prev][curr]}");
       // });
       _getNest(key) {
         if (dat.containsKey(key)) {
@@ -173,19 +259,19 @@ String stringVarMap(String _input, DataItem _item) {
           // print(i);
         }
         _matchGroup1 = dat.toString();
-        _processed = _input.replaceAll(_matchGroup0, _matchGroup1);
+        _processed = input.replaceAll(_matchGroup0, _matchGroup1);
       } else if (nestedKeys.length == 1) {
         // print(" == 1 - nestedKeys.length : " + nestedKeys.length.toString());
         // Check if the key exist
-        if (_item.data.containsKey(nestedKeys[0])) {
-          _matchGroup1 = _item.data[nestedKeys[0]];
+        if (item.data.containsKey(nestedKeys[0])) {
+          _matchGroup1 = item.data[nestedKeys[0]];
           if (_matchGroup1 == null) {
-            _processed = _input;
+            _processed = input;
           } else {
-            _processed = _input.replaceAll(_matchGroup0, _matchGroup1);
+            _processed = input.replaceAll(_matchGroup0, _matchGroup1);
           }
         } else {
-          _processed = _input;
+          _processed = input;
         }
 
         // print("_processed... " + _processed.toString());
@@ -195,12 +281,12 @@ String stringVarMap(String _input, DataItem _item) {
 
       // print(_processed);
     }
-    // print('_input');
-    // print(_input);
+    // print('input');
+    // print(input);
   } else {
-    // print(_item.data);
-    if (_item.data['cover'] != null) {
-      _processed = _item.data['cover'];
+    // print(item.data);
+    if (item.data['cover'] != null) {
+      _processed = item.data['cover'];
     }
   }
 

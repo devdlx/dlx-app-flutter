@@ -1,7 +1,7 @@
 import 'package:dlxapp/apps/saucetv/AppSettings.dart';
 import 'package:dlxapp/apps/saucetv/assets.dart';
 import 'package:dlxapp/apps/saucetv/saucetv.dart';
-import 'package:dlxapp/components/shellPage/shellPage.dart';
+import 'package:dlxapp/components/Page/Page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +26,7 @@ class _OnBoardingState extends State<OnBoarding> {
   void formPage(int i) {
     _formPageViewController.animateToPage(i,
         duration: Duration(milliseconds: 600), curve: Curves.ease);
-    print(_formPageViewController.page.toDouble().toString());
+    // print(_formPageViewController.page.toDouble().toString());
   }
 
   @override
@@ -54,7 +54,7 @@ class _OnBoardingState extends State<OnBoarding> {
     return Scaffold(
       body: PageShell(
           // color: Colors.grey.shade900,
-          // color: Colors.red,
+          color: Colors.red,
           // safeArea: true,
           child: SingleChildScrollView(
         child: Container(
@@ -64,7 +64,7 @@ class _OnBoardingState extends State<OnBoarding> {
             // mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               SizedBox(
-                height: 46,
+                height: 120,
               ),
               // Header/Logo
 
