@@ -1,8 +1,8 @@
-import 'package:dlxapp/components/Build/apiApp.dart';
-import 'package:dlxapp/components/Build/buildApp.dart';
-import 'package:dlxapp/components/Page/splashpage.dart';
 import 'package:flutter/material.dart';
+import 'components/buildApp/buildApp.dart';
 import 'package:provider/provider.dart';
+import 'package:dlxapp/components/buildApp/apiApp.dart';
+import 'package:dlxapp/components/splashPage/splashpage.dart';
 
 import 'package:dlxapp/apps/dlxstudios/dlxstudios.dart';
 
@@ -22,8 +22,8 @@ class DLXApp extends StatelessWidget {
 
           return app.isLoading
               ? MaterialApp(
-                  debugShowCheckedModeBanner: false,
-                  themeMode: ThemeMode.dark,
+                debugShowCheckedModeBanner: false,
+                themeMode: ThemeMode.dark,
                   home: PageSplash(),
                 )
               : BuildApp(app);
